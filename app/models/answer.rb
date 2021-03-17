@@ -4,5 +4,5 @@ class Answer < ApplicationRecord
     # specific to the question its not really worth it.
     # Just wanted to note the thought
     belongs_to :question
-    validates :answer presence: true
+    validates :answer, presence: true
 end
