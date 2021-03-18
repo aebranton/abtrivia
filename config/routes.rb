@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   root "pages#home"
 
+  get 'register', to: 'player#new'
+  post 'register', to: 'player#create'
+  get 'playerhistory', to: 'player#show'
+
+
   get '/login', to: 'logins#new'
   get '/logout', to: 'logins#destroy'
   post '/login', to: 'logins#create'

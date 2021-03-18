@@ -29,6 +29,15 @@ body {
     list-style-type: none;
 }
 
+ul.disc-inside {
+    padding-left: 0px;
+    list-style-position: inside;
+    display: inline-block;
+    text-align: left !important;
+    align-items: left;
+    margin-right: 40px;
+}
+
 #logo {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -69,6 +78,16 @@ input.btn-half-w {
     width: auto !important;
     margin: auto;
 }
-// input {
-//     height: auto !important;    
-// }
+
+table.buttons {
+    width: 50%;
+    table-layout: fixed;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+
+.buttons a {
+    width: 100%;
+    margin-top: 14px;
+}
