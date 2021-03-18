@@ -1,2 +1,8 @@
 <h1><%= @trivia_session.name %></h1>
 <p>Find me in app/views/trivia_session/show.html.erb</p>
+
+
+<div class="trivia-session-id-embed" id="ab-session-id" data-trivia-session-id="<%= @trivia_session.id %>">
+</div>
+<div class="trivia-session-id-embed" id="ab-player-id" data-trivia-player-id="<%= current_user.id %>">
+</div>

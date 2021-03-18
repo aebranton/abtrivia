@@ -18,6 +18,10 @@ class TriviaSessionController < ApplicationController
     redirect_to(trivia_session_show_path(id: @trivia_session.id))
   end
 
+  def create_with_sub(player, state, name, min_players=2)
+    @trivia_session = TriviaSession.create(player: player, trivia_session_state: state, name: name, min_players: min_players)
+  end
+
   def join_any
     if !logged_in?
       flash[:warning] = "You must be signed in to create or join trivia sessions."
