@@ -1,14 +1,33 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+// #fcfcfc
+// #363636
+// #74632c
+// #b39022
+// #f2bd18
+
 body {
-    padding-top: 100px;
+    padding-top: 80px;
 }
 
 .center {
     text-align: center;
 }
 
+.ab-content-title {
+    margin-left: 20px;
+}
+
+.center-hard {
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+
+.no-disc-list {
+    list-style-type: none;
+}
 
 #logo {
     margin-top: 10px;
@@ -17,10 +36,6 @@ body {
     margin-right: 10px;
     font-size: 2em;
     color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -1px;
-    padding-top: 9px;
-    font-weight: bold;
 }
 
 #logo:hover {
@@ -33,3 +48,27 @@ body {
     float: left;
     margin-top: 20px;    
 }
+
+.btn-ab-nav {
+    background-color: #fff;
+    color: #363636;
+}
+
+.nav_item_r {    
+    margin-left: auto;  
+}
+
+input, textarea, select, .uneditable-input {
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+input.btn-half-w {
+    width: auto !important;
+    margin: auto;
+}
+// input {
+//     height: auto !important;    
+// }

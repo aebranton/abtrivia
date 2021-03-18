@@ -1,22 +1,16 @@
 <header class="navbar navbar-fixed-top navbar-default">
     <div class="container">
-        <%= link_to "ABTrivia", root_path, class: "btn btn-lg btn-success", id: "logo" %>
+        <%= link_to image_tag("abtrivia_logo_02.JPG", border: 0, height: 50), {action: 'home', controller: 'pages'}, class: 'dock-item', id: "logo" %>
         <div class="nav_item">
-            <%= link_to "Link 0", "", class: "btn btn-default btn-warning" %>
-        </div>
-        <div class="nav_item">
-            <%= link_to "Link 2", "", class: "btn btn-default btn-warning" %>
+            <%= link_to "Leaderboard", "", class: "btn btn-default btn-ab-nav" %>
         </div>
 
         <% if logged_in? %>
             <div class="nav_item">
-                <%= link_to "New Recipe", "", class: "btn btn-default btn-warning" %>
-            </div>
-            <div class="nav_item">
-                <%= link_to "Logout", logout_path, class: "btn btn-default btn-danger" %>
+                <%= link_to "My History", "", class: "btn btn-default btn-ab-nav" %>
             </div>
 
-            <ul class="nav_item">
+            <ul class="nav_item pull-right no-disc-list">
                 <li class="dropdown">
                     <%= link_to("#", class: "btn btn-default btn-danger dropdown-toggle", "data-toggle" => "dropdown") do %>
                         <%= current_user().display_name %> <b class="caret"></b>
@@ -31,8 +25,9 @@
             </ul>
 
         <% else %>
-            <div class="nav_item">
-                <%= link_to "Login", "", class: "btn btn-default btn-success" %>
+            <div class="nav_item pull-right">
+                <%= link_to "Register", login_path, class: "btn btn-default btn-ab-nav" %>
+                <%= link_to "Login", login_path, class: "btn btn-default btn-success" %>
             </div>
         <% end %>
     </div>
