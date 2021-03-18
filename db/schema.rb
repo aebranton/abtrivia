@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(version: 2021_03_17_193024) do
   create_table "trivia_sessions", force: :cascade do |t|
     t.integer "player_id"
     t.integer "min_players"
-    t.integer "trivia_session_state"
+    t.integer "trivia_session_state_id"
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
