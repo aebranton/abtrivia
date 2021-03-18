@@ -1,0 +1,58 @@
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12">
+        <div class="well container">
+
+            <!-- When user is logged in -->
+            <% if logged_in? %>
+                <p><h3 class="center">Welcome, <%= current_user.display_name %></h3></p>
+                <hr>
+                <div class="center">
+                    <table class="buttons">
+                        <tr>
+                            <td><%= link_to "Join Next Game", "", class: "btn btn-default btn-ab-nav" %></td>
+                        </tr>
+                        <tr>
+                            <td><%= link_to "Find Friend's Game", "", class: "btn btn-default btn-ab-nav" %></td>
+                        </tr>
+                        <tr>
+                            <td><%= link_to "Create New", "", class: "btn btn-default btn-ab-nav" %></td>
+                        </tr>
+                    </table>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <footer><small>You should definitely hire me!</small></footer>
+                </div>
+            <% else %>
+                <p><h3 class="center">Get Started</h3></p>
+                <hr>
+                <div class="center">
+                    <h4>To hop into a trivia game, all you need to do is register with a display name and email address!</h5>
+                    <br>
+                    <%= link_to "Register", register_path, class: "btn btn-default btn-ab-nav" %>
+                    <hr>
+                    <br>
+                    <br>
+                    <strong>Trivia categories include:</strong></h6>
+                    <br>
+                    <br>
+                    <div class="container ab-tight">
+                        <small>
+                        <ul class="disc-inside">
+                            <% QuestionCategory.all.order(:name).each do |cat| %>
+                                <li><%= cat.name %></li>
+                            <% end %>
+                        </ul>
+                    </small>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <footer><small>You should definitely hire me!</small></footer>
+                </div>
+            <% end %>
+         </div>
+    </div>
+</div>
