@@ -44,15 +44,14 @@ $(document).on('turbolinks:load', function () {
         TriviaHelpers.updateHtmlOfAllByClass("tsd-min-player-count", data['needed']);
       }
 
-      // Action to start a countodwn timer to game start - still pending. Will change this at maybe 3 sec left
-      else if (received_action == "starting_timer") {
-        TriviaHelpers.addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
-        $("#tse-session-start-counter-area").removeClass("ab-hidden");          
-        $("#countdown-timer").html(data["value"]);
-      }
-
       // Action when the timer ticks!
       else if (received_action == "timer_tick") {
+        // Want to update this with something i set on the page rather than checking classes
+        // This is making sure the dics are swapped out for the appropriate state.
+        if (!$("#tse-pending-min-players-area").hasClass("ab-hidden")) {
+          TriviaHelpers.addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
+          $("#tse-session-start-counter-area").removeClass("ab-hidden");
+        }        
         $("#countdown-timer").html(data["value"]);
       }
 
