@@ -1,5 +1,5 @@
 import consumer from "./consumer"
-
+import {TriviaHelpers} from "../packs/custom/trivia_session"
 //CLIENT SIDE
 
 $(document).on('turbolinks:load', function () {
@@ -36,29 +36,22 @@ $(document).on('turbolinks:load', function () {
       console.log("Received broadcast:");
       console.log(data);
 
-      // mapping to be made better later
-      console.log("looking for player_count_update");
+      var received_action = TriviaHelpers.getAction(data);
 
-      var received_action = getAction(data);
-      console.log("Action was: " + received_action)
-
+      // Action to update player counts - game is still pending
       if (received_action == "player_count_update") {
-        $("#current-player-count").html(data['players']);
-        $("#min-player-count").html(data['needed']);
-        // TODO: Just testing how to call stuff!
-        // this.waiting();
+        TriviaHelpers.updateHtmlOfAllByClass("tsd-current-player-count", data['players']);
+        TriviaHelpers.updateHtmlOfAllByClass("tsd-min-player-count", data['needed']);
       }
 
+      // Action to start a countodwn timer to game start - still pending. Will change this at maybe 3 sec left
       else if (received_action == "starting_timer") {
-        if (!$("#pending-min-players").hasClass("ab-hidden")) {
-            $("#pending-min-players").addClass("ab-hidden");
-        }
-        if ($("#session-start-counter").hasClass("ab-hidden")) {
-          $("#session-start-counter").removeClass("ab-hidden");          
-        }
+        TriviaHelpers.addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
+        $("#tse-session-start-counter-area").removeClass("ab-hidden");          
         $("#countdown-timer").html(data["value"]);
       }
 
+      // Action when the timer ticks!
       else if (received_action == "timer_tick") {
         $("#countdown-timer").html(data["value"]);
       }
@@ -99,9 +92,3 @@ $(document).on('turbolinks:load', function () {
   })
 });
 
-function getAction(data) {
-  if ("action" in data) {
-    return data['action'];
-  }
-  return null;
-}

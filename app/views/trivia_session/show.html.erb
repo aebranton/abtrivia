@@ -11,15 +11,15 @@
                     <table class="t-info-table">
                         <tr>
                             <td><strong>Total Players:<strong></td>
-                            <td><span id="min-player-count">2</span></td>
+                            <td><span class="tsd-min-player-count">20</span></td>
                         </tr>
                         <tr>
                             <td><strong>Remaining:<strong></td>
-                            <td><span id="current-player-count">1</span></td>
+                            <td><span class="tsd-current-player-count">1</span></td>
                         </tr>
                         <tr>
                             <td><strong>Question:<strong></td>
-                            <td><span id="question-index">0</span></td>
+                            <td><span class="tsd-question-index">0</span></td>
                         </tr>
                     </table>
                 </small>                
@@ -29,20 +29,20 @@
             <div class="well">
 
                 <!-- DIV when waiting for enough players to start -->
-                <div class="contianer center" id="pending-min-players">
+                <div class="contianer center" id="tse-pending-min-players-area">
                     <h3>Waiting for players...</h3>
                     <small>Your session will start soon</small>
-                    <h5><span id="current-player-count">1</span> / <span id="min-player-count">20</span><h5>
+                    <h5><span class="tsd-current-player-count">1</span> / <span class="tsd-min-player-count">20</span><h5>
                 </div>
 
                 <!-- DIV when timer countdown to start -->
-                <div class="contianer center ab-hidden" id="session-start-counter">
+                <div class="contianer center ab-hidden" id="tse-session-start-counter-area">
                     <h3>Game Starting In <span id="countdown-timer"></span></h3>
                     <small>Prepare for trivial battle!</small>
                 </div>
 
                 <!-- DIV when questions come through -->
-                <div class="panel panel-warning ab-hidden">
+                <div class="panel panel-warning ab-hidden" id="tse-question-area">
                     <div class="panel-heading">
                         <h3 class="panel-title"><strong>Which NHL team won the Stanley Cup in the 2019-2020 season played in a bubble due to the Covid-19 pandemic?</strong></h3>
                     </div>

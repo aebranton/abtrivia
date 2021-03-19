@@ -1,3 +1,6 @@
+require_relative "channel_helpers/trivia_procs"
+include TriviaProcs
+
 class TriviaSocketChannel < ApplicationCable::Channel
   # SERVER SIDE  
 
@@ -12,8 +15,8 @@ class TriviaSocketChannel < ApplicationCable::Channel
     # Start stream
     stream_from "session_id_#{get_trivia_session_id}"
 
-    # How we broadcast to users...
-    count_players_and_route()
+    # Delay this broadcast so user who just connected actually gets the data
+    run_with_delay(1, :count_players_and_route)
   end
 
   def unsubscribed
@@ -31,19 +34,14 @@ class TriviaSocketChannel < ApplicationCable::Channel
 
     return if players_to_start.nil? || current_players.nil?
     
-    puts "BROADCASTING PLAYER COUNTS"
     broadcast_subscription({action: "player_count_update", players: current_players, needed: players_to_start})
     if current_players >= players_to_start
-      puts "BROADCASTING START TIMER"
       broadcast_subscription({action: "starting_timer", value: 30})
-      puts "\n\n\n\n\nCreating thread..."
       make_countdown_thread(30)
     end
   end
 
   def waiting
-    # This is just for testing and means nothing... wanna see it work
-    puts "\n\n\n\nReceived waiting from user: #{get_player_id}\n\n\n"
   end
 
   def ready
@@ -68,7 +66,16 @@ class TriviaSocketChannel < ApplicationCable::Channel
   end
 
   private
+
+    def run_with_delay(delay, func)
+      Thread.new {
+        sleep(delay)
+        method(func).call
+      }
+    end
+
     def make_countdown_thread(start)
+      # @@thread = Thread.new { TriviaProcs::create_countdown.call }
       @@thread = Thread.new {
         start.downto(0) do |c|
           broadcast_subscription({action: "timer_tick", value: c})
