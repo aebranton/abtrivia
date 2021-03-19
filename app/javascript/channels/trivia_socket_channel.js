@@ -35,7 +35,34 @@ $(document).on('turbolinks:load', function () {
       // Called when there's incoming data on the websocket for this channel
       console.log("Received broadcast:");
       console.log(data);
-      console.log(data['title']);
+
+      // mapping to be made better later
+      console.log("looking for player_count_update");
+
+      var received_action = getAction(data);
+      console.log("Action was: " + received_action)
+
+      if (received_action == "player_count_update") {
+        $("#current-player-count").html(data['players']);
+        $("#min-player-count").html(data['needed']);
+        // TODO: Just testing how to call stuff!
+        // this.waiting();
+      }
+
+      else if (received_action == "starting_timer") {
+        if (!$("#pending-min-players").hasClass("ab-hidden")) {
+            $("#pending-min-players").addClass("ab-hidden");
+        }
+        if ($("#session-start-counter").hasClass("ab-hidden")) {
+          $("#session-start-counter").removeClass("ab-hidden");          
+        }
+        $("#countdown-timer").html(data["value"]);
+      }
+
+      else if (received_action == "timer_tick") {
+        $("#countdown-timer").html(data["value"]);
+      }
+
     },
 
     waiting: function() {
@@ -72,5 +99,9 @@ $(document).on('turbolinks:load', function () {
   })
 });
 
-
-
+function getAction(data) {
+  if ("action" in data) {
+    return data['action'];
+  }
+  return null;
+}

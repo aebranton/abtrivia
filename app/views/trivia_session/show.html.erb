@@ -1,8 +1,62 @@
-<h1><%= @trivia_session.name %></h1>
-<p>Find me in app/views/trivia_session/show.html.erb</p>
-
-
 <div class="trivia-session-id-embed" id="ab-session-id" data-trivia-session-id="<%= @trivia_session.id %>">
 </div>
 <div class="trivia-session-id-embed" id="ab-player-id" data-trivia-player-id="<%= current_user.id %>">
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+            <div class="well">
+                <small>
+                    <table class="t-info-table">
+                        <tr>
+                            <td><strong>Total Players:<strong></td>
+                            <td><span id="min-player-count">2</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Remaining:<strong></td>
+                            <td><span id="current-player-count">1</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Question:<strong></td>
+                            <td><span id="question-index">0</span></td>
+                        </tr>
+                    </table>
+                </small>                
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-9-2 col-xs-9">
+            <div class="well">
+
+                <!-- DIV when waiting for enough players to start -->
+                <div class="contianer center" id="pending-min-players">
+                    <h3>Waiting for players...</h3>
+                    <small>Your session will start soon</small>
+                    <h5><span id="current-player-count">1</span> / <span id="min-player-count">20</span><h5>
+                </div>
+
+                <!-- DIV when timer countdown to start -->
+                <div class="contianer center ab-hidden" id="session-start-counter">
+                    <h3>Game Starting In <span id="countdown-timer"></span></h3>
+                    <small>Prepare for trivial battle!</small>
+                </div>
+
+                <!-- DIV when questions come through -->
+                <div class="panel panel-warning ab-hidden">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><strong>Which NHL team won the Stanley Cup in the 2019-2020 season played in a bubble due to the Covid-19 pandemic?</strong></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <button type="button" class="list-group-item list-group-item-action">Toronto Maple Leafs</button>
+                            <button type="button" class="list-group-item list-group-item-action">Detroit Redwings</button>
+                            <button type="button" class="list-group-item list-group-item-action">Tampa Bay Lightning</button>
+                            <button type="button" class="list-group-item list-group-item-action">Dallas Stars</button>
+                        </div>
+                    </div>
+                </div>  
+
+            </div>
+        </div>
+    </div>
 </div>

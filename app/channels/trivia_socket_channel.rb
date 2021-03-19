@@ -6,31 +6,44 @@ class TriviaSocketChannel < ApplicationCable::Channel
     increment_connection_count()
     trivia_object = get_trivia_session_object()
 
+    # make sure we actually have a session
     return if !trivia_object
-
-    players_to_start = trivia_object.min_players || 2
-    current_players = get_connection_count()
 
     # Start stream
     stream_from "session_id_#{get_trivia_session_id}"
 
     # How we broadcast to users...
-    # TODO: Clean up!
-    ActionCable.server.broadcast "session_id_#{get_trivia_session_id}", {message: "Test", title: "Title bitch"}    
-    ActionCable.server.broadcast "session_id_#{get_trivia_session_id}", {message: "Waiting for players, currently: #{current_players} / #{players_to_start}", title: "Waiting"}    
+    count_players_and_route()
   end
 
   def unsubscribed
     decrement_connection_count()
+    count_players_and_route()
+  end
 
+  def count_players_and_route    
     trivia_object = get_trivia_session_object()
+
+    # TODO: Change default min players
     players_to_start = trivia_object.min_players || 2
+    # players_to_start = 3
     current_players = get_connection_count()
 
-    ActionCable.server.broadcast "session_id_#{get_trivia_session_id}", {message: "Players Remaining: #{current_players} / #{players_to_start}", title: "Lost Somone"}    
+    return if players_to_start.nil? || current_players.nil?
+    
+    puts "BROADCASTING PLAYER COUNTS"
+    broadcast_subscription({action: "player_count_update", players: current_players, needed: players_to_start})
+    if current_players >= players_to_start
+      puts "BROADCASTING START TIMER"
+      broadcast_subscription({action: "starting_timer", value: 30})
+      puts "\n\n\n\n\nCreating thread..."
+      make_countdown_thread(30)
+    end
   end
 
   def waiting
+    # This is just for testing and means nothing... wanna see it work
+    puts "\n\n\n\nReceived waiting from user: #{get_player_id}\n\n\n"
   end
 
   def ready
@@ -55,6 +68,20 @@ class TriviaSocketChannel < ApplicationCable::Channel
   end
 
   private
+    def make_countdown_thread(start)
+      @@thread = Thread.new {
+        start.downto(0) do |c|
+          broadcast_subscription({action: "timer_tick", value: c})
+          sleep(1)
+        end
+      }
+    end
+
+    # Helper for faster broadcast code
+    def broadcast_subscription(data)
+      ActionCable.server.broadcast("session_id_#{get_trivia_session_id}", data)
+    end
+
     # Helper methods form app controller are not available in channels (no method identified_by) so we'll jsut remake it here
     # for time-sake of the demo
     def get_player_id
