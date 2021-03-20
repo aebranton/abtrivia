@@ -12,6 +12,7 @@ import "bootstrap"
 
 require("packs/custom/trivia_session")
 
+
 Rails.start()
 Turbolinks.start()
 ActiveStorage.start()

@@ -167,10 +167,10 @@ class SessionManager
                         # Also populates the sessions data state
                         get_question_for_session(session_id)
                     end
-                end 
-                
+                end                 
             end
         end
+        
         return p
     end    
 

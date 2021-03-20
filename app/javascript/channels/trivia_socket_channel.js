@@ -1,6 +1,7 @@
 import consumer from "./consumer"
-import {TriviaHelpers} from "../packs/custom/trivia_session"
+// import {TriviaHelpers} from "../packs/custom/trivia_session"
 //CLIENT SIDE
+import {getState, updateHtmlOfAllByClass, disableForm, enableForm, setItemActive, clearActiveItems, addClassSafe} from "../packs/custom/trivia_session"
 
 $(document).on('turbolinks:load', function () {
   
@@ -36,24 +37,25 @@ $(document).on('turbolinks:load', function () {
       console.log("Received broadcast:");
       console.log(data);
 
-      var state = TriviaHelpers.getState(data);
+      var state = getState(data);
 
       // Always update the player counts
-      TriviaHelpers.updateHtmlOfAllByClass("tsd-current-player-count", data['current_players']);
-      TriviaHelpers.updateHtmlOfAllByClass("tsd-min-player-count", data['players_to_start']);     
+      updateHtmlOfAllByClass("tsd-current-player-count", data['current_players']);
+      updateHtmlOfAllByClass("tsd-min-player-count", data['players_to_start']);     
       
       // when we toggle to starting state, swap the layouts to the countdown
       if (state == "starting") {        
         if (!$("#tse-pending-min-players-area").hasClass("ab-hidden")) {
-          TriviaHelpers.addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
+          addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
           $("#tse-session-start-counter-area").removeClass("ab-hidden");
         }
       }
 
       // Reveal the question area
-      if (state == "questioning") {        
+      if (state == "questioning") {   
+        // Display the question ** STILL NEED TIMER **     
         if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
-          TriviaHelpers.addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
+          addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
           $("#tse-question-area").removeClass("ab-hidden");
         }
       }
@@ -71,16 +73,25 @@ $(document).on('turbolinks:load', function () {
       // question state
       if (state == "questioning") {
         $("#question-text").html(data["question_text"]);
-        answer_index = 1
+        var answer_index = 1
         data["answers"].forEach(answer => {
-          $(`#answer-${answer_index}`).html(answer["answer"]);
-          // Still need to set the id
+          var current_button = $(`#answer-${answer_index}`);
+          // Set the answer text
+          current_button.html(answer["answer"]);
+          // Set the answer Id value
+          current_button.prop("value", answer["id"]);
+          answer_index += 1
         });
       }
 
       // answer state
       if (state == "answering") {
-        
+        clearActiveItems();
+        // Display answer area
+        if (!$("#tse-question-area").hasClass("ab-hidden")) {
+          addClassSafe($("#tse-question-area"), "ab-hidden");
+          $("#tse-review-area").removeClass("ab-hidden");
+        }
       }
 
     },
