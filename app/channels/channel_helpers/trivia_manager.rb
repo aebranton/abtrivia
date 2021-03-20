@@ -143,11 +143,15 @@ class SessionManager
                 if @@sessions[session_id][:session_data_state][:current_state] == :starting && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
                                         
+                    question = get_question(session_id)
                     # Toggle to question state
                     if @@sessions[session_id][:session_data_state][:countdown_value] == 1
                         @@sessions[session_id][:session_data_state][:current_state] = :questioning
                         @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_answer
-                        @@sessions[session_id][:session_data_state][:question_id] = get_question(session_id).id
+                        @@sessions[session_id][:session_data_state][:question_id] = question.id
+                        @@sessions[session_id][:session_data_state][:question_text] = question.question
+                        @@sessions[session_id][:session_data_state][:category] = question.question_category.name
+                        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
                         @@sessions[session_id][:session_data_state][:question_index] += 1
                     end
 
@@ -162,12 +166,16 @@ class SessionManager
 
                 elsif @@sessions[session_id][:session_data_state][:current_state] == :answering && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
-
+                    
+                    question = get_question(session_id)
                     # Toggle to answer review state
                     if @@sessions[session_id][:session_data_state][:countdown_value] == 1
                         @@sessions[session_id][:session_data_state][:current_state] = :questioning
                         @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_answer
-                        @@sessions[session_id][:session_data_state][:question_id] = get_question(session_id).id
+                        @@sessions[session_id][:session_data_state][:question_id] = question.id
+                        @@sessions[session_id][:session_data_state][:question_text] = question.question
+                        @@sessions[session_id][:session_data_state][:category] = question.question_category.name
+                        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
                         @@sessions[session_id][:session_data_state][:question_index] += 1
                     end
                 end 
@@ -183,6 +191,9 @@ class SessionManager
             countdown_value: @@seconds_before_game,
             question_index: 0,
             question_id: 0,
+            question_text: "",
+            category: "",
+            answers: nil,
             players_to_start: 0,
             current_players: 0,
         }

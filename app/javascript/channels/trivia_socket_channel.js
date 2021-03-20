@@ -50,19 +50,32 @@ $(document).on('turbolinks:load', function () {
         }
       }
 
+      // Reveal the question area
+      if (state == "questioning") {        
+        if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
+          TriviaHelpers.addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
+          $("#tse-question-area").removeClass("ab-hidden");
+        }
+      }
+
       // Update the timer
       if (data['countdown_value'] > 0) {
         $("#countdown-timer").html(data["countdown_value"]);
       }
       
-      // Update thr question index
+      // Update the question index
       if (data['question_index'] > 0) {
         $("#question-index-tracker").html(data["question_index"]);
       }
 
       // question state
       if (state == "questioning") {
-
+        $("#question-text").html(data["question_text"]);
+        answer_index = 1
+        data["answers"].forEach(answer => {
+          $(`#answer-${answer_index}`).html(answer["answer"]);
+          // Still need to set the id
+        });
       }
 
       // answer state
