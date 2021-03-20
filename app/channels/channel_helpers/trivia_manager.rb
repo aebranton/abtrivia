@@ -153,9 +153,11 @@ class SessionManager
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
 
                     # When question time is up, toggle to answer review state
-                    if @@sessions[session_id][:session_data_state][:countdown_value] == 1
+                    # Intentionally letting it go into negatives to allow time for DB
+                    if @@sessions[session_id][:session_data_state][:countdown_value] == 0
                         @@sessions[session_id][:session_data_state][:current_state] = :answering
                         @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_review
+                        get_round_results(session_id)
                     end
 
                 # tick down during answering state
@@ -174,6 +176,11 @@ class SessionManager
         return p
     end    
 
+    def get_round_results(session_id)
+        answers = PlayerAnswer.where(trivia_session_id: session_id)
+        @@sessions[session_id][:session_data_state][:round_results] = answers
+    end
+
     def make_session_data
         data = {
             current_state: :waiting,
@@ -183,6 +190,7 @@ class SessionManager
             question_text: "",
             category: "",
             answers: nil,
+            round_results: nil,
             players_to_start: 0,
             current_players: 0,
         }
@@ -206,7 +214,7 @@ class SessionManager
         @@sessions[session_id][:session_data_state][:question_id] = question.id
         @@sessions[session_id][:session_data_state][:question_text] = question.question
         @@sessions[session_id][:session_data_state][:category] = question.question_category.name
-        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
+        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id, correct")
         @@sessions[session_id][:session_data_state][:question_index] += 1
 
         # Make the session link for logging

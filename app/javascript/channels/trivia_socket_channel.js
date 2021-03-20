@@ -34,8 +34,8 @@ $(document).on('turbolinks:load', function () {
 
     received(data) {
       // Called when there's incoming data on the websocket for this channel
-      console.log("Received broadcast:");
-      console.log(data);
+      // console.log("Received broadcast:");
+      // console.log(data);
 
       var state = getState(data);
 
@@ -62,7 +62,7 @@ $(document).on('turbolinks:load', function () {
 
       // Update the timer
       if (data['countdown_value'] > 0) {
-        $("#countdown-timer").html(data["countdown_value"]);
+        $(".countdown-timer").html(data["countdown_value"]);
       }
       
       // Update the question index
@@ -87,13 +87,43 @@ $(document).on('turbolinks:load', function () {
       // answer state
       if (state == "answering") {
         clearActiveItems();
+        
+        // Get the current player
+        var player_id = $('#ab-player-id').attr('data-trivia-player-id');
+
         // Display answer area
         if (!$("#tse-question-area").hasClass("ab-hidden")) {
           addClassSafe($("#tse-question-area"), "ab-hidden");
           $("#tse-review-area").removeClass("ab-hidden");
         }
-      }
+        
+        // console.log(`Current Player ID: ${player_id}`);
 
+        // display results... i hope
+        var answer_index = 1;
+        data["answers"].forEach(answer => {
+          $(`#result-answer-${answer_index}-text`).html(answer.answer + ": ");
+          var count = data["round_results"].filter((obj) => obj.answer_id === answer.id).length;          
+          $(`#result-answer-${answer_index}-count`).html(count);
+          answer_index += 1;
+        });
+
+        // Get my result
+        var my_answer = data["round_results"].filter((obj) => obj.player_id === player_id);
+        
+        if (my_answer.length > 0) {
+          var target_answer = data["answers"].filter((obj) => obj.id === my_answer[0].answer_id);
+          if (target_answer[0].correct) {
+            $("#this-players-result").html("Correct!");
+          }
+          else {
+            $("#this-players-result").html("Eliminated!");
+          }
+        }
+        else {
+          $("#this-players-result").html("Eliminated!");
+        }
+      }
     },
 
     waiting: function() {
