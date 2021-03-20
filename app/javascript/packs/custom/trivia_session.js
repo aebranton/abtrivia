@@ -6,9 +6,9 @@ class TriviaHelpers {
         });
     }
       
-    static getAction(data) {
-        if ("action" in data) {
-            return data['action'];
+    static getState(data) {
+        if ("current_state" in data) {
+            return data['current_state'];
         }
         return null;
     }

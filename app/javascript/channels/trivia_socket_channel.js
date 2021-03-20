@@ -36,23 +36,38 @@ $(document).on('turbolinks:load', function () {
       console.log("Received broadcast:");
       console.log(data);
 
-      var received_action = TriviaHelpers.getAction(data);
+      var state = TriviaHelpers.getState(data);
 
-      // Action to update player counts - game is still pending
-      if (received_action == "player_count_update") {
-        TriviaHelpers.updateHtmlOfAllByClass("tsd-current-player-count", data['players']);
-        TriviaHelpers.updateHtmlOfAllByClass("tsd-min-player-count", data['needed']);
-      }
-
-      // Action when the timer ticks!
-      else if (received_action == "timer_tick") {
-        // Want to update this with something i set on the page rather than checking classes
-        // This is making sure the dics are swapped out for the appropriate state.
+      // Always update the player counts
+      TriviaHelpers.updateHtmlOfAllByClass("tsd-current-player-count", data['current_players']);
+      TriviaHelpers.updateHtmlOfAllByClass("tsd-min-player-count", data['players_to_start']);     
+      
+      // when we toggle to starting state, swap the layouts to the countdown
+      if (state == "starting") {        
         if (!$("#tse-pending-min-players-area").hasClass("ab-hidden")) {
           TriviaHelpers.addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
           $("#tse-session-start-counter-area").removeClass("ab-hidden");
-        }        
-        $("#countdown-timer").html(data["value"]);
+        }
+      }
+
+      // Update the timer
+      if (data['countdown_value'] > 0) {
+        $("#countdown-timer").html(data["countdown_value"]);
+      }
+      
+      // Update thr question index
+      if (data['question_index'] > 0) {
+        $("#question-index-tracker").html(data["question_index"]);
+      }
+
+      // question state
+      if (state == "questioning") {
+
+      }
+
+      // answer state
+      if (state == "answering") {
+        
       }
 
     },
