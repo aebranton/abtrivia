@@ -143,40 +143,29 @@ class SessionManager
                 if @@sessions[session_id][:session_data_state][:current_state] == :starting && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
                                         
-                    question = get_question(session_id)
                     # Toggle to question state
                     if @@sessions[session_id][:session_data_state][:countdown_value] == 1
-                        @@sessions[session_id][:session_data_state][:current_state] = :questioning
-                        @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_answer
-                        @@sessions[session_id][:session_data_state][:question_id] = question.id
-                        @@sessions[session_id][:session_data_state][:question_text] = question.question
-                        @@sessions[session_id][:session_data_state][:category] = question.question_category.name
-                        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
-                        @@sessions[session_id][:session_data_state][:question_index] += 1
+                        get_question_for_session(session_id)
                     end
 
+                # Tick down during questioning state
                 elsif @@sessions[session_id][:session_data_state][:current_state] == :questioning && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
 
-                    # Toggle to answer review state
+                    # When question time is up, toggle to answer review state
                     if @@sessions[session_id][:session_data_state][:countdown_value] == 1
                         @@sessions[session_id][:session_data_state][:current_state] = :answering
                         @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_review
                     end
 
+                # tick down during answering state
                 elsif @@sessions[session_id][:session_data_state][:current_state] == :answering && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
                     
-                    question = get_question(session_id)
-                    # Toggle to answer review state
-                    if @@sessions[session_id][:session_data_state][:countdown_value] == 1
-                        @@sessions[session_id][:session_data_state][:current_state] = :questioning
-                        @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_answer
-                        @@sessions[session_id][:session_data_state][:question_id] = question.id
-                        @@sessions[session_id][:session_data_state][:question_text] = question.question
-                        @@sessions[session_id][:session_data_state][:category] = question.question_category.name
-                        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
-                        @@sessions[session_id][:session_data_state][:question_index] += 1
+                    # When answer review time is up, get the next question
+                    if @@sessions[session_id][:session_data_state][:countdown_value] == 1                        
+                        # Also populates the sessions data state
+                        get_question_for_session(session_id)
                     end
                 end 
                 
@@ -199,17 +188,31 @@ class SessionManager
         }
     end
 
-    def get_question(session_id)
+    def get_question_for_session(session_id)
         question_id = 0
         question = nil
         if @@sessions[session_id][:used_question_ids].length >= (Question.count -1)
-            return nil
+            # Reset and recycle qwuestions for now
+            @@sessions[session_id][:used_question_ids] = Set.new
         end
-        # TODO: Need to prevent infinite loops when we fill up used questions
+
         while question_id <= 0 || @@sessions[session_id][:used_question_ids].include?(question_id) do
             question = Question.order(Arel.sql('RANDOM()')).first
             question_id = question.id
         end
+
+        @@sessions[session_id][:session_data_state][:countdown_value] = @@seconds_to_answer
+        @@sessions[session_id][:session_data_state][:current_state] = :questioning
+        @@sessions[session_id][:session_data_state][:question_id] = question.id
+        @@sessions[session_id][:session_data_state][:question_text] = question.question
+        @@sessions[session_id][:session_data_state][:category] = question.question_category.name
+        @@sessions[session_id][:session_data_state][:answers] = question.answers.select("answer, id")
+        @@sessions[session_id][:session_data_state][:question_index] += 1
+
+        # Make the session link for logging
+        TriviaSessionQuestion.create(trivia_session_id: session_id, question: question,
+            question_index: @@sessions[session_id][:session_data_state][:question_index])
+
         return question
     end
 

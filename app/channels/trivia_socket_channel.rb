@@ -1,6 +1,4 @@
 require_relative "channel_helpers/trivia_manager"
-require_relative "channel_helpers/trivia_procs"
-include TriviaProcs
 
 class TriviaSocketChannel < ApplicationCable::Channel
   # SERVER SIDE  
