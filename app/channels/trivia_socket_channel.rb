@@ -23,6 +23,9 @@ class TriviaSocketChannel < ApplicationCable::Channel
   end
 
   def eliminated
+    if params.has_key?(:player_id)
+      ActionCable.server.remote_connections.where(player_id: get_player_id).disconnect
+    end
   end
 
   def correct

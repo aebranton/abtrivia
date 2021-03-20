@@ -177,6 +177,7 @@ class SessionManager
     end    
 
     def get_round_results(session_id)
+        # TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
         answers = PlayerAnswer.where(trivia_session_id: session_id)
         @@sessions[session_id][:session_data_state][:round_results] = answers
     end

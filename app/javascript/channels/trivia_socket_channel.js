@@ -24,7 +24,6 @@ $(document).on('turbolinks:load', function () {
                                   player_id: $('#ab-player-id').attr('data-trivia-player-id') },
   {
     connected() {
-      console.log("Client connected to " + $('#ab-session-id').attr('data-trivia-session-id') );
       // Called when the subscription is ready for use on the server
     },
 
@@ -34,9 +33,6 @@ $(document).on('turbolinks:load', function () {
 
     received(data) {
       // Called when there's incoming data on the websocket for this channel
-      // console.log("Received broadcast:");
-      // console.log(data);
-
       var state = getState(data);
 
       // Always update the player counts
@@ -56,8 +52,11 @@ $(document).on('turbolinks:load', function () {
         // Display the question ** STILL NEED TIMER **     
         if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
           addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
-          $("#tse-question-area").removeClass("ab-hidden");
+        }  
+        if (!$("#tse-review-area").hasClass("ab-hidden")) {
+          addClassSafe($("#tse-review-area"), "ab-hidden");
         }
+        $("#tse-question-area").removeClass("ab-hidden");
       }
 
       // Update the timer
@@ -67,7 +66,7 @@ $(document).on('turbolinks:load', function () {
       
       // Update the question index
       if (data['question_index'] > 0) {
-        $("#question-index-tracker").html(data["question_index"]);
+        $(".tsd-question-index").html(data["question_index"]);
       }
 
       // question state
@@ -89,15 +88,13 @@ $(document).on('turbolinks:load', function () {
         clearActiveItems();
         
         // Get the current player
-        var player_id = $('#ab-player-id').attr('data-trivia-player-id');
+        var player_id = parseInt($('#ab-player-id').attr('data-trivia-player-id'));
 
         // Display answer area
         if (!$("#tse-question-area").hasClass("ab-hidden")) {
           addClassSafe($("#tse-question-area"), "ab-hidden");
           $("#tse-review-area").removeClass("ab-hidden");
         }
-        
-        // console.log(`Current Player ID: ${player_id}`);
 
         // display results... i hope
         var answer_index = 1;
@@ -109,8 +106,11 @@ $(document).on('turbolinks:load', function () {
         });
 
         // Get my result
+        // TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
         var my_answer = data["round_results"].filter((obj) => obj.player_id === player_id);
-        
+
+        // Make sure i have an answer - if i do, check if it is correct.
+        // If i failed to answer, eliminate me!
         if (my_answer.length > 0) {
           var target_answer = data["answers"].filter((obj) => obj.id === my_answer[0].answer_id);
           if (target_answer[0].correct) {
@@ -118,10 +118,12 @@ $(document).on('turbolinks:load', function () {
           }
           else {
             $("#this-players-result").html("Eliminated!");
+            this.eliminated();
           }
         }
         else {
           $("#this-players-result").html("Eliminated!");
+          this.eliminated();
         }
       }
     },
