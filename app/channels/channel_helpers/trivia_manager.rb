@@ -5,7 +5,7 @@ class SessionManager
         # Change back to 30
         @@seconds_before_game = 5
         @@seconds_to_answer = 15
-        @@seconds_to_review = 15
+        @@seconds_to_review = 7
     end
 
     def run_with_delay(delay, func, arg)
@@ -66,11 +66,20 @@ class SessionManager
 
         # If the session is now empty
         if @@sessions[session_id][:con_counts].length <= 0
-            if !@@sessions[session_id][:session_thread].nil?
-                @@sessions[session_id][:session_thread].terminate               
-            end
-            @@sessions.delete(session_id)
+            end_session(session_id)
         end        
+    end
+
+    def end_session(session_id)
+        if !@@sessions.has_key?(session_id)
+            return
+        end
+
+        if !@@sessions[session_id][:session_thread].nil?
+            @@sessions[session_id][:session_thread].terminate               
+        end
+        
+        @@sessions.delete(session_id)
     end
 
     def update_session_status(session_id)
@@ -178,7 +187,7 @@ class SessionManager
 
     def get_round_results(session_id)
         # TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
-        answers = PlayerAnswer.where(trivia_session_id: session_id)
+        answers = PlayerAnswer.where(trivia_session_id: session_id, question_id: @@sessions[session_id][:session_data_state][:question_id])
         @@sessions[session_id][:session_data_state][:round_results] = answers
     end
 

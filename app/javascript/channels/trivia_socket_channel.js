@@ -46,17 +46,29 @@ $(document).on('turbolinks:load', function () {
           $("#tse-session-start-counter-area").removeClass("ab-hidden");
         }
       }
+      
+      // WE HAVE A WINNER
+      // Catch early if someone is a winner
+      if (state == "questioning" && data['current_players'] == 1) {
 
-      // Reveal the question area
-      if (state == "questioning") {   
-        // Display the question ** STILL NEED TIMER **     
-        if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
-        }  
+        // Before we disconnect we gotta end the trivia session
+        console.log("SENDING SESSION ENDED");
+
+        this.session_ended();
+
+        // we have a winner 
+        // hide review area
         if (!$("#tse-review-area").hasClass("ab-hidden")) {
           addClassSafe($("#tse-review-area"), "ab-hidden");
-        }
-        $("#tse-question-area").removeClass("ab-hidden");
+        }        
+
+        $("#tse-victors-circle").removeClass("ab-hidden");          
+        
+        consumer.subscriptions['subscriptions'].forEach(element => {
+          consumer.subscriptions.remove(element);
+        });
+
+        return;
       }
 
       // Update the timer
@@ -71,6 +83,18 @@ $(document).on('turbolinks:load', function () {
 
       // question state
       if (state == "questioning") {
+        // Change the divs around for questioning
+        if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
+          addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
+        }  
+        if (!$("#tse-review-area").hasClass("ab-hidden")) {
+          addClassSafe($("#tse-review-area"), "ab-hidden");
+        }
+        $("#tse-question-area").removeClass("ab-hidden");
+
+        // Set the question ID on the form
+        $("#form-trivia-question-id").prop("value", data["question_id"]);
+
         $("#question-text").html(data["question_text"]);
         var answer_index = 1
         data["answers"].forEach(answer => {
@@ -107,23 +131,35 @@ $(document).on('turbolinks:load', function () {
 
         // Get my result
         // TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
-        var my_answer = data["round_results"].filter((obj) => obj.player_id === player_id);
+        var my_answer = data["round_results"].filter((obj) => obj.player_id === player_id && data["question_id"] === obj.question_id);
 
         // Make sure i have an answer - if i do, check if it is correct.
         // If i failed to answer, eliminate me!
         if (my_answer.length > 0) {
           var target_answer = data["answers"].filter((obj) => obj.id === my_answer[0].answer_id);
+
           if (target_answer[0].correct) {
             $("#this-players-result").html("Correct!");
           }
           else {
+            // ELIMINIATED
             $("#this-players-result").html("Eliminated!");
-            this.eliminated();
+            $("#eliminated-return-button").removeClass("ab-hidden");
+            updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);            
+            consumer.subscriptions['subscriptions'].forEach(element => {
+              console.log(element);
+              consumer.subscriptions.remove(element);
+            });
           }
         }
         else {
           $("#this-players-result").html("Eliminated!");
-          this.eliminated();
+          $("#eliminated-return-button").removeClass("ab-hidden");
+          updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);
+          consumer.subscriptions['subscriptions'].forEach(element => {
+            console.log(element);
+            consumer.subscriptions.remove(element);
+          });
         }
       }
     },
@@ -132,16 +168,16 @@ $(document).on('turbolinks:load', function () {
       return this.perform('waiting');
     },
 
-    ready: function() {
-      return this.perform('ready');
+    victory: function() {
+      return this.perform('victory');
     },
 
     eliminated: function() {
       return this.perform('eliminated');
     },
 
-    correct: function() {
-      return this.perform('correct');
+    session_ended: function() {
+      return this.perform('session_ended');
     },
 
     incoming: function() {

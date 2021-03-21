@@ -15,6 +15,7 @@
         $("#answer-form").submit(function (e2) {    
             console.log(e2.originalEvent.submitter.id);
             $(`#${e2.originalEvent.submitter.id}`).addClass("active");
+            disableForm();
         });
     });
 </script>
@@ -78,14 +79,8 @@
                                 </fieldset>
                                 <%= text_field_tag "player_id", current_user.id, class: "ab-hidden", id: "form-player-id" %>
                                 <%= text_field_tag "trivia_session_id", @trivia_session.id, class: "ab-hidden", id: "form-trivia-session-id" %>
-                            <% end %>
-                            
-                            <!--
-                            <button type="button" id="answer-1" class="list-group-item list-group-item-action">Toronto Maple Leafs</button>
-                            <button type="button" id="answer-2" class="list-group-item list-group-item-action">Detroit Redwings</button>
-                            <button type="button" id="answer-3" class="list-group-item list-group-item-action">Tampa Bay Lightning</button>
-                            <button type="button" id="answer-4" class="list-group-item list-group-item-action">Dallas Stars</button>
-                            -->
+                                <%= text_field_tag "question_id", "-1", class: "ab-hidden", id: "form-trivia-question-id" %>
+                            <% end %>                            
                         </div>
                     </div>
                 </div>  
@@ -96,10 +91,32 @@
                         <h5 class="pull-right ab-timer-pad-right"><strong>Time Remaining: </strong><span class="countdown-timer"></span></h5>
                     </div>
                     <h2 id="this-players-result">Correct!</h2>
-                    <p><span id="result-answer-1-text"><strong>Answer 1: </strong></span><span id="result-answer-1-count">2</span></p>
-                    <p><span id="result-answer-2-text"><strong>Answer 2: </strong></span><span id="result-answer-2-count">4</span></p>
-                    <p><span id="result-answer-3-text"><strong>Answer 3: </strong></span><span id="result-answer-3-count">9</span></p>
-                    <p><span id="result-answer-4-text"><strong>Answer 4: </strong></span><span id="result-answer-4-count">1</span></p>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <strong><span id="result-answer-1-text"><strong>Answer 1: </strong></span><span class="ab-nudge-right" id="result-answer-1-count"></span>
+                        </div>
+                        <div class="list-group-item">
+                            <strong><span id="result-answer-2-text"><strong>Answer 1: </strong></span><span class="ab-nudge-right" id="result-answer-2-count"></span>
+                        </div>
+                        <div class="list-group-item">
+                            <strong><span id="result-answer-3-text"><strong>Answer 1: </strong></span><span class="ab-nudge-right" id="result-answer-3-count"></span>
+                        </div>
+                        <div class="list-group-item">
+                            <strong><span id="result-answer-4-text"><strong>Answer 1: </strong></span><span class="ab-nudge-right" id="result-answer-4-count"></span>
+                        </div>   
+                    </div>         
+                    <%= link_to "Return Home", root_path, class: "btn btn-default btn-danger ab-hidden", id: "eliminated-return-button" %>        
+                </div>
+
+                <!-- DIV when timer countdown to start -->
+                <div class="contianer center ab-hidden" id="tse-victors-circle">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Victory!</h4>
+                        <p>Congratulations! You have bested all of your oponnents in trivial warfare. Bragging rights are yours, as is our first place prize! Which is unfortunately nothing, but its all yours!</p>
+                        <hr>
+                        <p class="mb-0">Dont worry, all the losers had to donate 5$ to us, so youre still ahead.</p>
+                        <%= link_to "Return Home", root_path, class: "btn btn-default btn-success" %>
+                    </div>
                 </div>
 
             </div>

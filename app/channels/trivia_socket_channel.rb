@@ -19,16 +19,35 @@ class TriviaSocketChannel < ApplicationCable::Channel
   def waiting
   end
 
-  def ready
-  end
-
-  def eliminated
+  def victory
     if params.has_key?(:player_id)
       ActionCable.server.remote_connections.where(player_id: get_player_id).disconnect
     end
   end
 
-  def correct
+  def eliminated
+    if params.has_key?(:player_id)
+      @@manager.remove_session_player(get_trivia_session_id(), get_player_id())
+    end
+  end
+
+  def session_ended
+    puts "\n\n\n\n\n\n\n\n\n\n"
+    puts "Session Ended Received"
+    player_id = get_player_id()
+    session_id = get_trivia_session_id()
+    puts "Player: #{player_id}"
+    puts "Session: #{session_id}"
+    if session_id.nil?
+      return
+    end
+    puts "GOING TO UPDATE"
+    # End the session
+    state = TriviaSessionState.find_by(name: "Ended")
+    session = TriviaSession.find(session_id)
+    session.trivia_session_state = state
+    session.save()
+    @@manager.end_session(session_id)
   end
 
   def incoming
