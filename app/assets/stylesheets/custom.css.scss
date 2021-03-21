@@ -52,6 +52,12 @@ ul.disc-inside {
     text-decoration: none;
 }
 
+@media screen and (max-width: 720px) {
+    #logo {
+        display: none !important;
+    }
+}
+
 .nav_item {
     margin-left: 25px;
     float: left;
@@ -90,4 +96,33 @@ table.buttons {
 .buttons a {
     width: 100%;
     margin-top: 14px;
+}
+
+.trivia-session-id-embed {
+    display: none;
+}
+
+.ab-hidden {
+    display: none;
+}
+
+.panel-default > .panel-heading-custom {
+    background: #666666; color: #fff; 
+}
+
+.t-info-table {
+    width: 100%;
+}
+
+table.t-info-table td {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.ab-timer-pad-right {
+    margin-right: 25px;
+}
+
+.ab-nudge-right {
+    margin-left: 25px;
 }
