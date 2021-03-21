@@ -3,6 +3,13 @@ import consumer from "./consumer"
 //CLIENT SIDE
 import {getState, updateHtmlOfAllByClass, disableForm, enableForm, setItemActive, clearActiveItems, addClassSafe} from "../packs/custom/trivia_session"
 
+function removeSubscription() {
+  consumer.subscriptions['subscriptions'].forEach(element => {
+    // TODO: Test that this only removes current players
+    consumer.subscriptions.remove(element);
+  });
+}
+
 $(document).on('turbolinks:load', function () {
   
   var trivia_id = $('#ab-session-id').attr('data-trivia-session-id');
@@ -15,13 +22,13 @@ $(document).on('turbolinks:load', function () {
   
     // Do not create the subscription if we are not on a page supplying an ID to subscrube to
     return;
-  }
+  }  
 
   // We are on the trivia session show page, and have a game ready to connect.
   // Subscribe!
-  consumer.subscriptions.create({ channel: "TriviaSocketChannel",
-                                  trivia_session_id: $('#ab-session-id').attr('data-trivia-session-id'),
-                                  player_id: $('#ab-player-id').attr('data-trivia-player-id') },
+  var subscription = consumer.subscriptions.create({ channel: "TriviaSocketChannel",
+                                                     trivia_session_id: $('#ab-session-id').attr('data-trivia-session-id'),
+                                                     player_id: $('#ab-player-id').attr('data-trivia-player-id') },
   {
     connected() {
       // Called when the subscription is ready for use on the server
@@ -49,25 +56,19 @@ $(document).on('turbolinks:load', function () {
       
       // WE HAVE A WINNER
       // Catch early if someone is a winner
+      console.log(`State: ${state} PCOunt: ${data['current_players']}`);
       if (state == "questioning" && data['current_players'] == 1) {
 
         // Before we disconnect we gotta end the trivia session
-        console.log("SENDING SESSION ENDED");
-
         this.session_ended();
+        
 
-        // we have a winner 
-        // hide review area
+        // we have a winner hide review area
         if (!$("#tse-review-area").hasClass("ab-hidden")) {
           addClassSafe($("#tse-review-area"), "ab-hidden");
         }        
 
-        $("#tse-victors-circle").removeClass("ab-hidden");          
-        
-        consumer.subscriptions['subscriptions'].forEach(element => {
-          consumer.subscriptions.remove(element);
-        });
-
+        $("#tse-victors-circle").removeClass("ab-hidden");                  
         return;
       }
 
@@ -99,9 +100,8 @@ $(document).on('turbolinks:load', function () {
         var answer_index = 1
         data["answers"].forEach(answer => {
           var current_button = $(`#answer-${answer_index}`);
-          // Set the answer text
+          // Set the answer text and ID value
           current_button.html(answer["answer"]);
-          // Set the answer Id value
           current_button.prop("value", answer["id"]);
           answer_index += 1
         });
@@ -145,21 +145,17 @@ $(document).on('turbolinks:load', function () {
             // ELIMINIATED
             $("#this-players-result").html("Eliminated!");
             $("#eliminated-return-button").removeClass("ab-hidden");
-            updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);            
-            consumer.subscriptions['subscriptions'].forEach(element => {
-              console.log(element);
-              consumer.subscriptions.remove(element);
-            });
+            updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);    
+            
+            removeSubscription();
           }
         }
         else {
           $("#this-players-result").html("Eliminated!");
           $("#eliminated-return-button").removeClass("ab-hidden");
           updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);
-          consumer.subscriptions['subscriptions'].forEach(element => {
-            console.log(element);
-            consumer.subscriptions.remove(element);
-          });
+          
+          removeSubscription();
         }
       }
     },
@@ -195,6 +191,9 @@ $(document).on('turbolinks:load', function () {
     closed: function() {
       return this.perform('closed');
     }
-  })
+  });
+
+  this.subscription = subscription;
+
 });
 

@@ -32,21 +32,19 @@ class TriviaSocketChannel < ApplicationCable::Channel
   end
 
   def session_ended
-    puts "\n\n\n\n\n\n\n\n\n\n"
-    puts "Session Ended Received"
     player_id = get_player_id()
     session_id = get_trivia_session_id()
-    puts "Player: #{player_id}"
-    puts "Session: #{session_id}"
     if session_id.nil?
       return
     end
-    puts "GOING TO UPDATE"
+
     # End the session
     state = TriviaSessionState.find_by(name: "Ended")
     session = TriviaSession.find(session_id)
     session.trivia_session_state = state
+    # Save the changes
     session.save()
+    # Kill the session
     @@manager.end_session(session_id)
   end
 
@@ -63,7 +61,6 @@ class TriviaSocketChannel < ApplicationCable::Channel
   end
 
   private
-
     # Helper methods form app controller are not available in channels (no method identified_by) so we'll jsut remake it here
     # for time-sake of the demo
     def get_player_id
