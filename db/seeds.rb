@@ -105,7 +105,7 @@ Answer.create(question: q, correct: false, answer: "Mars")
 Answer.create(question: q, correct: true, answer: "Venus")
 Answer.create(question: q, correct: false, answer: "Pluto")
 
-q = Question.create(question_category: cat_sci, question: "Electrons can have be \"up\" or \"down\" in this term scientists use:")
+q = Question.create(question_category: cat_sci, question: "Electrons can have \"up\" or \"down\" in this term scientists use:")
 Answer.create(question: q, correct: true, answer: "Spin")
 Answer.create(question: q, correct: false, answer: "Velocity")
 Answer.create(question: q, correct: false, answer: "Angle")
