@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   get 'trivia_session/create'
   get 'trivia_session/show'
   
+  get 'new_custom', to: 'trivia_session#new_custom'
+  post 'create_custom', to: 'trivia_session#create_custom'
+  
   post '/submit_answer', to: 'player_answer#create'
 
   get 'pages/home'

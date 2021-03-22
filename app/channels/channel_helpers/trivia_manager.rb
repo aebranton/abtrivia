@@ -79,6 +79,11 @@ class SessionManager
         if !@@sessions[session_id][:session_thread].nil?
             @@sessions[session_id][:session_thread].terminate               
         end
+
+        # Make sure its marked as ended!
+        end_state = TriviaSessionState.find_by(name: "Ended")
+        @@sessions[session_id][:trivia_object].trivia_session_state = end_state
+        @@sessions[session_id][:trivia_object].save()
         
         @@sessions.delete(session_id)
     end

@@ -6,7 +6,7 @@ class TriviaSessionController < ApplicationController
     end
   end
 
-  def create(is_auto=true)
+  def create
     if !logged_in?
       flash[:warning] = "You must be signed in to create or join trivia sessions."
       redirect_to(register_path)
@@ -18,8 +18,23 @@ class TriviaSessionController < ApplicationController
     redirect_to(trivia_session_show_path(id: @trivia_session.id))
   end
 
-  def create_with_sub(player, state, name, min_players=2)
-    @trivia_session = TriviaSession.create(player: player, trivia_session_state: state, name: name, min_players: min_players)
+  def create_custom
+    if !logged_in?
+      flash[:warning] = "You must be signed in to create or join trivia sessions."
+      redirect_to(register_path)
+    end
+    # Auto create test
+    @trivia_session = TriviaSession.create(player: current_user, trivia_session_state: TriviaSessionState.find_by(name: "Pending"),
+                                           name: params[:name], min_players: params[:min_players])
+    flash[:success] = "Created new custom trivia game!"
+    redirect_to(trivia_session_show_path(id: @trivia_session.id))
+  end
+
+  def new_custom
+    if !logged_in?
+      flash[:warning] = "You must be signed in to create or join trivia sessions."
+      redirect_to(register_path)
+    end
   end
 
   def join_any
