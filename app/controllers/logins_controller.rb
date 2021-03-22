@@ -7,13 +7,14 @@ class LoginsController < ApplicationController
   # that it can be done is enough. Not an impressive enough thing to add to spend the time, or
   # your time to think up and use passwords
   def create
-    player = Player.find_by(email: params[:email])
+    email = params[:email].downcase
+    player = Player.find_by(email: email)
     if player
       session[:player_id] = player.id
       flash[:success] = "Logged in as \"#{player.display_name}\""
       redirect_to(root_path)
     else
-      flash[:danger] = "No player currently registered with the email: #{params[:email]}."
+      flash[:danger] = "No player currently registered with the email: #{email}."
       # TODO: Redirect to sign up
       redirect_to(root_path)
     end

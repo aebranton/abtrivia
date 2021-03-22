@@ -26,7 +26,7 @@
                 <!-- These have -1 on them as in the current setup, the final question is quueed up before the session is flicked to end, which is totally fine. -->
                 <!-- As long as we account for it. -->
                 <td><%= trivia_session.trivia_session_questions.count - 1 %></td>
-                <td><%= trivia_session.trivia_session_questions.count - 1 == my_correct_count ? "W" : "L" %></td>
+                <td><%= trivia_session.trivia_session_questions.count - 1 == my_correct_count && my_correct_count > 0 ? "W" : "L" %></td>
                 </tr>
             <% end %>                  
         </tbody>
