@@ -53,6 +53,16 @@ $(document).on('turbolinks:load', function () {
     received(data) {
       // When we receive a broadcast it contains some game data, including a state. Get the state first
       var state = getState(data);
+      
+      // Get the current player
+      var player_id = parseInt($('#ab-player-id').attr('data-trivia-player-id'));
+      
+      // Quickly check if this players ID is in the eliminated set - if so, do not let them in!
+      if (data["eliminated_players"].includes(player_id)) {
+        swapVisibleIds(["tse-pending-min-players-area", "tse-session-start-counter-area", "tse-review-area", "tse-question-area"], ["tse-eliminated-block"])
+        removeSubscription();
+        return;
+      }
 
       // Always update the player counts
       updateHtmlOfAllByClass("tsd-current-player-count", data['current_players']);
@@ -110,10 +120,7 @@ $(document).on('turbolinks:load', function () {
 
       // STATE IS ANSWERING
       if (state == "answering") {
-        clearActiveItems();
-        
-        // Get the current player
-        var player_id = parseInt($('#ab-player-id').attr('data-trivia-player-id'));
+        clearActiveItems();        
 
         // Display answer area
         swapVisibleIds(["tse-question-area"], ["tse-review-area"]);
@@ -164,8 +171,10 @@ $(document).on('turbolinks:load', function () {
             // Remove my player count because i wont get the next timer tick to do so.
             updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);    
             
+            // Send my eliminated signal so i can get blocked
+            this.player_eliminated();
+
             // Remove me from the socket subscription, I lost.
-            // TODO: Should i send this players ID in to make sure they cant refresh rejoin???
             removeSubscription();
         }
       }
@@ -174,6 +183,11 @@ $(document).on('turbolinks:load', function () {
     // Sent by a user when they are the only one left
     session_ended: function() {
       return this.perform('session_ended');
+    },
+
+    // Sent by a user when they are eliminated, to make sure they get added to the blocked list
+    player_eliminated: function() {
+      return this.perform('player_eliminated');
     },
 
   });

@@ -28,7 +28,7 @@
                 <small>
                     <table class="t-info-table">
                         <tr>
-                            <td><strong>Total Players:<strong></td>
+                            <td><strong>Min Players:<strong></td>
                             <td><span class="tsd-min-player-count"><%= @trivia_session.min_players %></span></td>
                         </tr>
                         <tr>
@@ -119,6 +119,17 @@
                         <hr>
                         <p class="mb-0">Dont worry, all the losers had to donate 5$ to us, so youre still ahead.</p>
                         <%= link_to "Return Home", root_path, class: "btn btn-default btn-success" %>
+                    </div>
+                </div>
+
+                <!-- DIV Eliminated players trying to rejoin -->
+                <div class="contianer center ab-hidden" id="tse-eliminated-block">
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Cheater!</h4>
+                        <p>You were already eliminated from this session. You cant just slide back in here pretending nothing ever happened! Go home!</p>
+                        <hr>
+                        <p class="mb-0">Go on, Get.</p>
+                        <%= link_to "Return Home", root_path, class: "btn btn-default btn-danger" %>
                     </div>
                 </div>
 

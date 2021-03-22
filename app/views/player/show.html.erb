@@ -21,7 +21,7 @@
                 <% trivia_session = TriviaSession.find(session_id) %>
                 <% my_correct_count = players_answers.where(trivia_session_id: trivia_session.id).select{ |x| x.answer.correct }.count() %>
                 <tr>
-                <td><%= trivia_session.created_at %></td>
+                <td><%= localize(trivia_session.created_at, :format => :long) %></td>
                 <td><%= my_correct_count %></td>
                 <!-- These have -1 on them as in the current setup, the final question is quueed up before the session is flicked to end, which is totally fine. -->
                 <!-- As long as we account for it. -->
