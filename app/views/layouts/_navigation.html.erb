@@ -1,13 +1,10 @@
 <header class="navbar navbar-fixed-top navbar-default">
     <div class="container">
         <%= link_to image_tag("abtrivia_logo_02.JPG", border: 0, height: 50), {action: 'home', controller: 'pages'}, class: 'dock-item', id: "logo" %>
-        <div class="nav_item">
-            <%= link_to "Leaderboard", "", class: "btn btn-default btn-ab-nav" %>
-        </div>
 
         <% if logged_in? %>
             <div class="nav_item">
-                <%= link_to "My History", "", class: "btn btn-default btn-ab-nav" %>
+                <%= link_to "My History", player_history_path, class: "btn btn-default btn-ab-nav" %>
             </div>
 
             <ul class="nav_item pull-right no-disc-list">

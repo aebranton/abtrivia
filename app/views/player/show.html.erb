@@ -1,2 +1,35 @@
-<h1>Player#show</h1>
-<p>Find me in app/views/player/show.html.erb</p>
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-8 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12">
+        <h3>My Trivia History</h3>
+        <!-- I am very aware that if this were production code, I would paginate this - possibly with a date range so the player sees only their last -->
+        <!-- 30 days by default, but then can change the range -->
+        <!-- For this example, I think ive shown I could do that, and that I know i should - but I need to save some time for work! -->
+        <table class="table table-striped">
+        <thead>
+            <tr>
+            <th scope="col">Trivia Date</th>
+            <th scope="col">Rounds Survived</th>
+            <th scope="col">Total Rounds</th>
+            <th scope="col">W/L</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% players_answers = PlayerAnswer.where(player_id: @player.id) %>
+            <% sessions_played = SortedSet.new(players_answers.pluck("trivia_session_id").to_set) %>
+            <% current_session = sessions_played.max %>
+            <% sessions_played.reverse_each do |session_id| %>
+                <% trivia_session = TriviaSession.find(session_id) %>
+                <% my_correct_count = players_answers.where(trivia_session_id: trivia_session.id).select{ |x| x.answer.correct }.count() %>
+                <tr>
+                <td><%= trivia_session.created_at %></td>
+                <td><%= my_correct_count %></td>
+                <!-- These have -1 on them as in the current setup, the final question is quueed up before the session is flicked to end, which is totally fine. -->
+                <!-- As long as we account for it. -->
+                <td><%= trivia_session.trivia_session_questions.count - 1 %></td>
+                <td><%= trivia_session.trivia_session_questions.count - 1 == my_correct_count ? "W" : "L" %></td>
+                </tr>
+            <% end %>                  
+        </tbody>
+        </table>        
+    </div>
+</div>
