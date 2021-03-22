@@ -1,6 +1,6 @@
-<div class="trivia-session-id-embed" id="ab-session-id" data-trivia-session-id="<%= @trivia_session.id %>">
+<div class="trivia-session-id-embed" id="ab-session-id" data-trivia-session-id="<%= @trivia_session != nil ? @trivia_session.id : 0 %>">
 </div>
-<div class="trivia-session-id-embed" id="ab-player-id" data-trivia-player-id="<%= current_user.id %>">
+<div class="trivia-session-id-embed" id="ab-player-id" data-trivia-player-id="<%= current_user != nil ? current_user.id : 0 %>">
 </div>
 
 <%= javascript_pack_tag 'custom/trivia_session', 'data-turbolinks-track': 'reload' %>
@@ -29,7 +29,7 @@
                     <table class="t-info-table">
                         <tr>
                             <td><strong>Min Players:<strong></td>
-                            <td><span class="tsd-min-player-count"><%= @trivia_session.min_players %></span></td>
+                            <td><span class="tsd-min-player-count"><%= @trivia_session != nil ? @trivia_session.min_players : 0 %></span></td>
                         </tr>
                         <tr>
                             <td><strong>Remaining:<strong></td>
@@ -50,7 +50,7 @@
                 <div class="contianer center" id="tse-pending-min-players-area">
                     <h3>Waiting for players...</h3>
                     <small>Your session will start soon</small>
-                    <h5><span class="tsd-current-player-count">1</span> / <span class="tsd-min-player-count"><%= @trivia_session.min_players %></span><h5>
+                    <h5><span class="tsd-current-player-count">1</span> / <span class="tsd-min-player-count"><%= @trivia_session != nil ? @trivia_session.min_players : 0 %></span><h5>
                 </div>
 
                 <!-- DIV when timer countdown to start -->
@@ -78,8 +78,8 @@
                                     <%= button_tag "Answer 3", name: "answer_id", class: "list-group-item list-group-item-action", id: "answer-3", type: "submit", value: 3 %>
                                     <%= button_tag "Asnwer 4", name: "answer_id", class: "list-group-item list-group-item-action", id: "answer-4", type: "submit", value: 4 %>
                                 </fieldset>
-                                <%= text_field_tag "player_id", current_user.id, class: "ab-hidden", id: "form-player-id" %>
-                                <%= text_field_tag "trivia_session_id", @trivia_session.id, class: "ab-hidden", id: "form-trivia-session-id" %>
+                                <%= text_field_tag "player_id", current_user != nil ? current_user.id : 0, class: "ab-hidden", id: "form-player-id" %>
+                                <%= text_field_tag "trivia_session_id", @trivia_session != nil ? @trivia_session.id : 0, class: "ab-hidden", id: "form-trivia-session-id" %>
                                 <%= text_field_tag "question_id", "-1", class: "ab-hidden", id: "form-trivia-question-id" %>
                             <% end %>                            
                         </div>

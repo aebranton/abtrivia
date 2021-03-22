@@ -18,6 +18,7 @@ class TriviaSessionController < ApplicationController
     if !logged_in?
       flash[:warning] = "You must be signed in to create or join trivia sessions."
       redirect_to(register_path)
+      return
     end
     # Auto create test
     @trivia_session = TriviaSession.create(player: current_user, trivia_session_state: TriviaSessionState.find_by(name: "Pending"),
