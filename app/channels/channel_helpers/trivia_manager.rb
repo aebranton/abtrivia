@@ -2,10 +2,11 @@ class SessionManager
     def initialize
         @@sessions ||= Hash.new
 
-        # Change back to 30
+        # Change back to 15
         @@seconds_before_game = 5
         @@seconds_to_answer = 15
         @@seconds_to_review = 7
+
     end
 
     def run_with_delay(delay, func, arg)
@@ -87,7 +88,7 @@ class SessionManager
             return nil
         end
 
-        min_players = @@sessions[session_id][:trivia_object].min_players || 2
+        min_players = @@sessions[session_id][:trivia_object].min_players
         current_players = get_session_player_count(session_id)
 
         @@sessions[session_id][:session_data_state][:players_to_start] = min_players
@@ -141,7 +142,7 @@ class SessionManager
             while @@sessions[session_id][:con_counts].length > 0 do
                 
                 # Update player counts
-                @@sessions[session_id][:session_data_state][:players_to_start] = @@sessions[session_id][:trivia_object].min_players || 2
+                @@sessions[session_id][:session_data_state][:players_to_start] = @@sessions[session_id][:trivia_object].min_players
                 @@sessions[session_id][:session_data_state][:current_players] = @@sessions[session_id][:con_counts].length
 
                 # Broadcast our data
@@ -151,7 +152,15 @@ class SessionManager
                 # Give us a countdown starting the game
                 if @@sessions[session_id][:session_data_state][:current_state] == :starting && @@sessions[session_id][:session_data_state][:countdown_value] > 0
                     @@sessions[session_id][:session_data_state][:countdown_value] -= 1
-                                        
+                    # Want to allow more to join until the countdown is just about over so here we will change the state
+                    if @@sessions[session_id][:session_data_state][:countdown_value] <= 3
+                        # Flip the session state        
+                        active_state = TriviaSessionState.find_by(name: "Active")
+                        @@sessions[session_id][:trivia_object].trivia_session_state = active_state
+                        @@sessions[session_id][:trivia_object].save()
+
+                    end
+                    
                     # Toggle to question state
                     if @@sessions[session_id][:session_data_state][:countdown_value] == 1
                         get_question_for_session(session_id)
@@ -186,7 +195,6 @@ class SessionManager
     end    
 
     def get_round_results(session_id)
-        # TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
         answers = PlayerAnswer.where(trivia_session_id: session_id, question_id: @@sessions[session_id][:session_data_state][:question_id])
         @@sessions[session_id][:session_data_state][:round_results] = answers
     end
