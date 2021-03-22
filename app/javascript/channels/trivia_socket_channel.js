@@ -1,26 +1,38 @@
 import consumer from "./consumer"
-// import {TriviaHelpers} from "../packs/custom/trivia_session"
-//CLIENT SIDE
-import {getState, updateHtmlOfAllByClass, disableForm, enableForm, setItemActive, clearActiveItems, addClassSafe} from "../packs/custom/trivia_session"
-
+import {getState, updateHtmlOfAllByClass, clearActiveItems, addClassSafe} from "../packs/custom/trivia_session"
+/** 
+* Helper function to remove this users subscription
+* @return {undefined} No return
+*/
 function removeSubscription() {
   consumer.subscriptions['subscriptions'].forEach(element => {
-    // TODO: Test that this only removes current players
     consumer.subscriptions.remove(element);
+  });
+}
+/** 
+* Swap visibility of some dom elements. Give a list of div ID names that need to be made hidden, and a list that need to be made visible. Do not include # id marker.
+* @param {Array} makeHidden - array of ID names to hide; ['my-div-id']
+* @param {Array} makeVisible - array of ID names to show; ['my-div-id-to-show']
+* @return {undefined} no return
+*/
+function swapVisibleIds(makeHidden, makeVisible) {
+  makeHidden.forEach(hide => {
+    addClassSafe($(`#${hide}`), "ab-hidden");
+  });
+  makeVisible.forEach(show => {
+    $(`#${show}`).removeClass("ab-hidden");
   });
 }
 
 $(document).on('turbolinks:load', function () {
   
+  // We stored the trivia session ID on a DOM element so we can retreive it here
   var trivia_id = $('#ab-session-id').attr('data-trivia-session-id');
 
   // If we have left the page with an ID to subscribe to, delete the subcription, you left the game!
   if (trivia_id == undefined) {
-    consumer.subscriptions['subscriptions'].forEach(element => {
-      consumer.subscriptions.remove(element);
-    });
-  
-    // Do not create the subscription if we are not on a page supplying an ID to subscrube to
+    removeSubscription();
+    // Do not create the subscription if we are not on a page supplying an ID to subscribe to
     return;
   }  
 
@@ -39,7 +51,7 @@ $(document).on('turbolinks:load', function () {
     },
 
     received(data) {
-      // Called when there's incoming data on the websocket for this channel
+      // When we receive a broadcast it contains some game data, including a state. Get the state first
       var state = getState(data);
 
       // Always update the player counts
@@ -47,32 +59,25 @@ $(document).on('turbolinks:load', function () {
       updateHtmlOfAllByClass("tsd-min-player-count", data['players_to_start']);     
       
       // when we toggle to starting state, swap the layouts to the countdown
-      if (state == "starting") {        
-        if (!$("#tse-pending-min-players-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-pending-min-players-area"), "ab-hidden");
-          $("#tse-session-start-counter-area").removeClass("ab-hidden");
-        }
+      if (state == "starting") {   
+        swapVisibleIds(["tse-pending-min-players-area"], ["tse-session-start-counter-area"]);
       }
       
       // WE HAVE A WINNER
       // Catch early if someone is a winner
-      console.log(`State: ${state} PCOunt: ${data['current_players']}`);
       if (state == "questioning" && data['current_players'] == 1) {
 
-        // Before we disconnect we gotta end the trivia session
-        this.session_ended();
+        // Notify the trivia manager to wrap it up!
+        this.session_ended();        
+
+        // we have a winner hide review area, and show victory!
+        swapVisibleIds(["tse-review-area"], ["tse-victors-circle"]);    
         
-
-        // we have a winner hide review area
-        if (!$("#tse-review-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-review-area"), "ab-hidden");
-        }        
-
-        $("#tse-victors-circle").removeClass("ab-hidden");                  
+        // Return, we are done here
         return;
       }
 
-      // Update the timer
+      // Update the timer counts
       if (data['countdown_value'] > 0) {
         $(".countdown-timer").html(data["countdown_value"]);
       }
@@ -82,20 +87,16 @@ $(document).on('turbolinks:load', function () {
         $(".tsd-question-index").html(data["question_index"]);
       }
 
-      // question state
+      // STATE IS QUESTIONING
       if (state == "questioning") {
-        // Change the divs around for questioning
-        if (!$("#tse-session-start-counter-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-session-start-counter-area"), "ab-hidden");
-        }  
-        if (!$("#tse-review-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-review-area"), "ab-hidden");
-        }
-        $("#tse-question-area").removeClass("ab-hidden");
+        
+        // Make sure we hide other divs that could have been shown, and display the question setup
+        swapVisibleIds(["tse-session-start-counter-area", "tse-review-area"], ["tse-question-area"]);        
 
         // Set the question ID on the form
         $("#form-trivia-question-id").prop("value", data["question_id"]);
 
+        // Set the question text, and answers texts on our form
         $("#question-text").html(data["question_text"]);
         var answer_index = 1
         data["answers"].forEach(answer => {
@@ -107,7 +108,7 @@ $(document).on('turbolinks:load', function () {
         });
       }
 
-      // answer state
+      // STATE IS ANSWERING
       if (state == "answering") {
         clearActiveItems();
         
@@ -115,82 +116,66 @@ $(document).on('turbolinks:load', function () {
         var player_id = parseInt($('#ab-player-id').attr('data-trivia-player-id'));
 
         // Display answer area
-        if (!$("#tse-question-area").hasClass("ab-hidden")) {
-          addClassSafe($("#tse-question-area"), "ab-hidden");
-          $("#tse-review-area").removeClass("ab-hidden");
-        }
+        swapVisibleIds(["tse-question-area"], ["tse-review-area"]);
 
         // display results... i hope
         var answer_index = 1;
         data["answers"].forEach(answer => {
-          $(`#result-answer-${answer_index}-text`).html(answer.answer + ": ");
+
+          // Set what the answer was again so we can see
+          if (answer.correct) {
+            $(`#result-answer-${answer_index}-text`).html("(Correct) " + answer.answer + ": ");
+          }
+          else {
+            $(`#result-answer-${answer_index}-text`).html(answer.answer + ": ");
+          }
+
+          // Display the count of people who picked this answer
           var count = data["round_results"].filter((obj) => obj.answer_id === answer.id).length;          
           $(`#result-answer-${answer_index}-count`).html(count);
           answer_index += 1;
         });
 
-        // Get my result
-        // TODO: NEED TO ADD QUESTION ID TO PLAYER ANSWER FOR CONVENIENCE, THEN FILTER HERE
+        // Get this players answer 
         var my_answer = data["round_results"].filter((obj) => obj.player_id === player_id && data["question_id"] === obj.question_id);
 
-        // Make sure i have an answer - if i do, check if it is correct.
-        // If i failed to answer, eliminate me!
+        // See if this player is continuing or not. Corerct, they move on.
+        // Wrong, or didnt answer in time, they are eliminated
+        var is_correct = false;
         if (my_answer.length > 0) {
+
+          // Get the answer object for my playeranswer
           var target_answer = data["answers"].filter((obj) => obj.id === my_answer[0].answer_id);
 
+          // Correct
           if (target_answer[0].correct) {
+            is_correct = true;
             $("#this-players-result").html("Correct!");
           }
-          else {
-            // ELIMINIATED
+        }
+
+        // If they were wrong or didnt answer
+        if (is_correct == false) {
+
+            // Show the eliminated message and provide a go home button      
             $("#this-players-result").html("Eliminated!");
             $("#eliminated-return-button").removeClass("ab-hidden");
+
+            // Remove my player count because i wont get the next timer tick to do so.
             updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);    
             
+            // Remove me from the socket subscription, I lost.
+            // TODO: Should i send this players ID in to make sure they cant refresh rejoin???
             removeSubscription();
-          }
-        }
-        else {
-          $("#this-players-result").html("Eliminated!");
-          $("#eliminated-return-button").removeClass("ab-hidden");
-          updateHtmlOfAllByClass("tsd-current-player-count", data['current_players'] - 1);
-          
-          removeSubscription();
         }
       }
     },
 
-    waiting: function() {
-      return this.perform('waiting');
-    },
-
-    victory: function() {
-      return this.perform('victory');
-    },
-
-    eliminated: function() {
-      return this.perform('eliminated');
-    },
-
+    // Sent by a user when they are the only one left
     session_ended: function() {
       return this.perform('session_ended');
     },
 
-    incoming: function() {
-      return this.perform('incoming');
-    },
-
-    ask: function() {
-      return this.perform('ask');
-    },
-
-    answer: function() {
-      return this.perform('answer');
-    },
-
-    closed: function() {
-      return this.perform('closed');
-    }
   });
 
   this.subscription = subscription;

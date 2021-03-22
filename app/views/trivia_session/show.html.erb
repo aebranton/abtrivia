@@ -20,6 +20,7 @@
     });
 </script>
 
+<!-- Side-bar section that shows how many players we started with, how many remain, and what # of question this is -->
 <div class="container">
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
@@ -85,11 +86,12 @@
                     </div>
                 </div>  
 
-                <!-- DIV when timer countdown to start -->
+                <!-- DIV ANswer review area - if you get eliminated, also provides a button to return home -->
                 <div class="contianer center ab-hidden" id="tse-review-area">
                     <div class="row">
                         <h5 class="pull-right ab-timer-pad-right"><strong>Time Remaining: </strong><span class="countdown-timer"></span></h5>
                     </div>
+                    <!-- Shows as Correct or Eliminated -->
                     <h2 id="this-players-result">Correct!</h2>
                     <div class="list-group">
                         <div class="list-group-item">
@@ -104,11 +106,12 @@
                         <div class="list-group-item">
                             <strong><span id="result-answer-4-text"><strong>Answer 1: </strong></span><span class="ab-nudge-right" id="result-answer-4-count"></span>
                         </div>   
-                    </div>         
+                    </div>      
+                    <!-- When a player gets eliminated, this gets shown -->   
                     <%= link_to "Return Home", root_path, class: "btn btn-default btn-danger ab-hidden", id: "eliminated-return-button" %>        
                 </div>
 
-                <!-- DIV when timer countdown to start -->
+                <!-- DIV Victory message - once a player has won, they can see this part -->
                 <div class="contianer center ab-hidden" id="tse-victors-circle">
                     <div class="alert alert-success" role="alert">
                         <h4 class="alert-heading">Victory!</h4>

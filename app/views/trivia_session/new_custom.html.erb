@@ -2,15 +2,17 @@
 
 <script>
 $(document).ready(function() {
-
+    // Quick "validation" to make sure we have given the game some sort of name
     $('#custom-form').submit(function() {  
-    if ($('#game-name').val() == "") {
-        alert("You must name your trivia game.");
-        return false;
+        if ($('#game-name').val() == "") {
+            alert("You must name your trivia game.");
+            return false;
         }
-    if ($('#min-players').val() <= 0 || $('#min-players').val() > 5000) {
-        alert("You can only have between 1 - 5,000 players");
-        return false;
+        // Also make sure we are not starting a game for 0 people, and well max it out at 5k for now.
+        // This is pretty arbitrary, but given were deploying on free heroku, probably more than enough
+        if ($('#min-players').val() <= 0 || $('#min-players').val() > 5000) {
+            alert("You can only have between 1 - 5,000 players");
+            return false;
         }
     });
 
