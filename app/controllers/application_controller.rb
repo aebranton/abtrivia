@@ -9,5 +9,5 @@ class ApplicationController < ActionController::Base
     def logged_in?()
         # Basically a bool cast
         !!current_user()
-    end    
+    end
 end

@@ -8,7 +8,7 @@ class PlayerAnswerTest < ActiveSupport::TestCase
     player = Player.new(display_name: "Alex Branton", email: "ae.branton9@gmail.com")
     trivia_session_state = TriviaSessionState.new(name: "Pending")
     trivia_session = TriviaSession.new(player: player, trivia_session_state: trivia_session_state, name: "Test Session")
-    @player_answer = PlayerAnswer.new(answer: answer, player: player, trivia_session: trivia_session)
+    @player_answer = PlayerAnswer.new(answer: answer, player: player, trivia_session: trivia_session, question: question)
   end
 
   test "answer text should exist" do
