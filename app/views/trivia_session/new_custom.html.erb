@@ -1,0 +1,39 @@
+<%= render "shared/simple_title", title: "New Custom" %>
+
+<script>
+$(document).ready(function() {
+    // Quick "validation" to make sure we have given the game some sort of name
+    $('#custom-form').submit(function() {  
+        if ($('#game-name').val() == "") {
+            alert("You must name your trivia game.");
+            return false;
+        }
+        // Also make sure we are not starting a game for 0 people, and well max it out at 5k for now.
+        // This is pretty arbitrary, but given were deploying on free heroku, probably more than enough
+        if ($('#min-players').val() <= 0 || $('#min-players').val() > 5000) {
+            alert("You can only have between 1 - 5,000 players");
+            return false;
+        }
+    });
+
+    return;
+});
+
+
+</script>
+
+<div class="row">
+    <div class="well col-lg-6 col-md-6 col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
+        <%= form_tag(create_custom_path, id: "custom-form") do %>
+            <%= label_tag(:name, "Game Name:") %>
+            <%= text_field_tag(:name, "", id: "game-name") %>
+
+            <%= label_tag(:min_players, "# Players To Start:") %>
+            <%= number_field_tag(:min_players, 5, id: "min-players") %>
+
+            <%= submit_tag("Create", class: "btn btn-success") %>
+
+        <% end %>
+        <br>
+    </div>
+</div>
