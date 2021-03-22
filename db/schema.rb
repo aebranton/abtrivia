@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_21_153241) do
+ActiveRecord::Schema.define(version: 2021_03_22_001900) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id"
@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(version: 2021_03_21_153241) do
 
   create_table "trivia_sessions", force: :cascade do |t|
     t.integer "player_id"
-    t.integer "min_players"
+    t.integer "min_players", default: 2
     t.integer "trivia_session_state_id"
     t.string "name"
     t.datetime "created_at", precision: 6, null: false

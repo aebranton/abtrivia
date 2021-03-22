@@ -28,7 +28,7 @@
                     <table class="t-info-table">
                         <tr>
                             <td><strong>Total Players:<strong></td>
-                            <td><span class="tsd-min-player-count">20</span></td>
+                            <td><span class="tsd-min-player-count"><%= @trivia_session.min_players %></span></td>
                         </tr>
                         <tr>
                             <td><strong>Remaining:<strong></td>
@@ -49,7 +49,7 @@
                 <div class="contianer center" id="tse-pending-min-players-area">
                     <h3>Waiting for players...</h3>
                     <small>Your session will start soon</small>
-                    <h5><span class="tsd-current-player-count">1</span> / <span class="tsd-min-player-count">20</span><h5>
+                    <h5><span class="tsd-current-player-count">1</span> / <span class="tsd-min-player-count"><%= @trivia_session.min_players %></span><h5>
                 </div>
 
                 <!-- DIV when timer countdown to start -->
