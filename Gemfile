@@ -55,6 +55,8 @@ group :production do
   gem 'pg'
   # Heroku gem
   gem 'rails_12factor'
+  # Redis wasnt there
+  gem 'redis', '~> 4.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
